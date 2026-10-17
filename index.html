@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Official review and ratings portal for the AI Powered Development showcase at VJCET. Share your rating, feedback, and experience." />
+  <title>Review &amp; Rating Portal · AI Powered Development</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>" />
+
+  <!-- Auto Forward to /review -->
+  <script>
+    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+      window.location.replace('/review');
+    }
+  </script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Supabase Official JS SDK CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="cyber-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <a href="/" class="brand-link">
+          <span class="brand-icon">⬡</span>
+          <span>NEXUS // REVIEWS</span>
+        </a>
+        <a href="https://vjcet-presentation-website.vercel.app/" target="_blank" rel="noopener" class="main-site-btn" title="Return to main VJCET Showcase website">
+          ← VJCET Showcase ↗
+        </a>
+      </div>
+
+      <!-- Search Omnibox (Type /review to go to review opinions) -->
+      <div class="nav-search-wrap">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="navSearchInput"
+            class="search-input"
+            placeholder='Search opinions or type "/review"...'
+            aria-label="Search reviews or enter /review"
+            autocomplete="off"
+          />
+          <span class="search-shortcut-hint">/</span>
+          <span class="search-route-badge" id="navRouteBadge" style="display:none;" title="Click to navigate">
+            ⚡ Go to /review
+          </span>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <a href="/review" class="nav-link" title="Explore opinions and average ratings">
+          📊 /review
+        </a>
+        <button id="soundToggleBtn" class="sound-toggle-btn" title="Toggle cyber sound effects">
+          🔊 Sound: ON
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="event-cyber-badge">
+      <span class="pulse-dot"></span>
+      EVENT PROTOCOL // AI POWERED DEVELOPMENT
+    </div>
+    <h1 class="hero-title">
+      Rate &amp; Share Your Experience<br />
+      <span class="glow-gradient">AI Powered Development</span>
+    </h1>
+    <p class="hero-subtitle">
+      Welcome to the decentralized review matrix. Evaluate the presentation, agentic workflows, and live development showcase. Your feedback shapes the next iteration.
+    </p>
+    <div class="hero-actions">
+      <a href="#submitReviewForm" class="cyber-btn cyber-btn-primary">
+        ⚡ Transmit Your Review
+      </a>
+      <a href="/review" class="cyber-btn cyber-btn-outline">
+        📊 View Opinions &amp; Average Rating (/review) →
+      </a>
+    </div>
+  </header>
+
+  <!-- Live Telemetry Stats Bar -->
+  <section class="telemetry-bar">
+    <div class="stat-card">
+      <div class="stat-icon-wrap">⭐</div>
+      <div class="stat-content">
+        <span class="stat-value dyn-avg-rating">—</span>
+        <span class="stat-label">Average Score (/ 5.0)</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap">👥</div>
+      <div class="stat-content">
+        <span class="stat-value dyn-total-reviews">—</span>
+        <span class="stat-label">Total Verified Reviews</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap">🚀</div>
+      <div class="stat-content">
+        <span class="stat-value dyn-positive-rate">—</span>
+        <span class="stat-label">Satisfaction Rate</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap">🛰️</div>
+      <div class="stat-content">
+        <span class="stat-value" style="font-size:1.1rem; color:var(--cyan); font-family:var(--font-mono);">AI-DEV-2026</span>
+        <span class="stat-label">Event Protocol ID</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Futuristic Review Submission Form -->
+  <main class="form-section-container" id="submitReviewForm">
+    <div class="cyber-card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">
+            <span>📡</span> Submit Your Review
+          </h2>
+          <p class="card-subtitle">
+            Provide your authentic rating and feedback for the event: <strong>AI Powered Development</strong>
+          </p>
+        </div>
+        <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--cyan);">
+          [ STATUS: LIVE SYNC ]
+        </div>
+      </div>
+
+      <form id="reviewForm" novalidate>
+        <!-- Name & Email Inputs -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="cyber-label" for="userNameInput">
+              <span>Full Name</span>
+              <span class="req">*Required</span>
+            </label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input
+                type="text"
+                id="userNameInput"
+                name="name"
+                class="cyber-input"
+                placeholder="e.g. Alex Morgan"
+                maxlength="80"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="cyber-label" for="userEmailInput">
+              <span>Email Address</span>
+              <span class="req">*Required (Verification)</span>
+            </label>
+            <div class="input-wrap">
+              <span class="input-icon">✉️</span>
+              <input
+                type="email"
+                id="userEmailInput"
+                name="email"
+                class="cyber-input"
+                placeholder="e.g. alex@nexus.io"
+                maxlength="100"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Futuristic Interactive Rating Bar -->
+        <div class="rating-bar-container" id="ratingBarContainer">
+          <div class="rating-header-status">
+            <span class="rating-level-badge">
+              💎 LEVEL 5 // GROUNDBREAKING NEXT-GEN AI
+            </span>
+            <div class="numeric-score-display">
+              <span class="numeric-score-value">5</span>
+              <span class="denom">/ 5.0</span>
+            </div>
+          </div>
+
+          <!-- Clickable Star Crystals -->
+          <div class="stars-interactive-row">
+            <div class="star-node active" data-value="1" title="Rate 1 Star">
+              <span class="star-glyph">★</span>
+              <span class="star-label">1 · Basic</span>
+            </div>
+            <div class="star-node active" data-value="2" title="Rate 2 Stars">
+              <span class="star-glyph">★</span>
+              <span class="star-label">2 · Fair</span>
+            </div>
+            <div class="star-node active" data-value="3" title="Rate 3 Stars">
+              <span class="star-glyph">★</span>
+              <span class="star-label">3 · Good</span>
+            </div>
+            <div class="star-node active" data-value="4" title="Rate 4 Stars">
+              <span class="star-glyph">★</span>
+              <span class="star-label">4 · Impressive</span>
+            </div>
+            <div class="star-node active" data-value="5" title="Rate 5 Stars">
+              <span class="star-glyph">★</span>
+              <span class="star-label">5 · Next-Gen</span>
+            </div>
+          </div>
+
+          <!-- Continuous Slider Bar -->
+          <div class="slider-bar-track-wrap">
+            <input
+              type="range"
+              class="cyber-slider"
+              min="1"
+              max="5"
+              step="1"
+              value="5"
+              aria-label="Rating scale from 1 to 5"
+            />
+            <div class="slider-labels-row">
+              <span>Needs Work (1★)</span>
+              <span>Solid Capability (3★)</span>
+              <span>Groundbreaking AI (5★)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience Comment Box -->
+        <div class="form-group">
+          <label class="cyber-label" for="commentInput">
+            <span>What was your experience with AI Powered Development?</span>
+            <span id="charCount" style="color:var(--text-muted); font-size:0.75rem;">0 / 500</span>
+          </label>
+          <textarea
+            id="commentInput"
+            name="comment"
+            class="cyber-textarea"
+            placeholder="Share your thoughts on the session, agentic capabilities, live demos, and overall impact..."
+            maxlength="500"
+            required
+          ></textarea>
+
+          <!-- Prompt inspiration chips -->
+          <div class="prompt-chips-wrap">
+            <span style="font-size:0.72rem; color:var(--text-muted); align-self:center; font-family:var(--font-mono);">
+              Quick Inspirations:
+            </span>
+            <button type="button" class="prompt-chip" data-append="Mindblowing live agentic coding demo!">
+              ⚡ Live Demo
+            </button>
+            <button type="button" class="prompt-chip" data-append="Impressive prompt engineering & LLM architecture.">
+              🧠 Architecture
+            </button>
+            <button type="button" class="prompt-chip" data-append="Very insightful look into the future of software engineering.">
+              🚀 Future of Dev
+            </button>
+            <button type="button" class="prompt-chip" data-append="Practical and actionable production takeaways.">
+              💡 Production Value
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="cyber-btn cyber-btn-primary submit-cyber-btn" style="width:100%; justify-content:center; margin-top:1rem;">
+          ⚡ TRANSMIT REVIEW PROTOCOL
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Recent Attendee Opinions Preview Ticker -->
+  <section style="max-width:1250px; margin:0 auto 5rem; padding:0 1.5rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h2 style="font-family:var(--font-cyber); font-size:1.4rem; color:#fff;">
+          🌐 Verified Attendee Opinions
+        </h2>
+        <p style="color:var(--text-dim); font-size:0.88rem;">
+          Realtime impressions broadcasted by session attendees
+        </p>
+      </div>
+      <a href="/review" class="cyber-btn cyber-btn-outline cyber-btn-sm">
+        📊 Explore Full /review Section &amp; Breakdown →
+      </a>
+    </div>
+
+    <div id="recentReviewsCarousel" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+      <div class="loading-box" style="width:100%;">
+        <div class="cyber-spinner"></div>
+        <span>Syncing telemetry from Supabase Cloud...</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Success Holographic Modal -->
+  <div class="cyber-modal-backdrop" id="successModal">
+    <div class="cyber-modal-box" style="padding:2.5rem; text-align:center;">
+      <button class="modal-close-btn" onclick="closeSuccessModal()">✕</button>
+      <div style="font-size:3.5rem; margin-bottom:1rem; filter:drop-shadow(0 0 16px var(--cyan));">✨</div>
+      <h2 style="font-family:var(--font-cyber); font-size:1.6rem; color:#fff; margin-bottom:0.75rem;">
+        Review Transmitted Successfully!
+      </h2>
+      <p style="color:var(--text-dim); font-size:0.95rem; margin-bottom:1.5rem;">
+        Thank you, <strong id="modalSubmittedName" style="color:var(--cyan);">Attendee</strong>! Your rating of <strong id="modalSubmittedScore" style="color:#ffd700;">5/5</strong> has been permanently logged in the decentralized registry for <strong>AI Powered Development</strong>.
+      </p>
+      <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+        <a href="/review" class="cyber-btn cyber-btn-primary">
+          📊 View In /review Directory
+        </a>
+        <button class="cyber-btn cyber-btn-outline" onclick="closeSuccessModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="cyber-footer">
+    <div class="footer-content">
+      <div class="footer-brand-text">
+        ⬡ AI POWERED DEVELOPMENT · REVIEW MATRIX &copy; 2026
+      </div>
+      <div class="footer-links">
+        <a href="https://vjcet-presentation-website.vercel.app/" target="_blank" rel="noopener" class="footer-link">
+          VJCET Main Showcase ↗
+        </a>
+        <a href="/review" class="footer-link">
+          /review Directory
+        </a>
+        <a href="#submitReviewForm" class="footer-link">
+          Submit Rating
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="particles.js"></script>
+  <script src="audio.js"></script>
+  <script src="supabase.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

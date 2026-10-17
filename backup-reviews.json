@@ -1,0 +1,56 @@
+[
+  {
+    "id": "40334a5b-8ece-452d-874f-f7f94e64099a",
+    "event_name": "AI powered development",
+    "name": "Elena Rostova",
+    "email": "elena.rostova@nexus-tech.io",
+    "rating": 5,
+    "comment": "The session on agentic workflows and prompt orchestration was phenomenal. Completely revolutionized how our team approaches autonomous code synthesis.",
+    "created_at": "2026-10-13T12:59:13.54903+00:00"
+  },
+  {
+    "id": "28f536bd-d14e-4657-960a-00115a5ff7fe",
+    "event_name": "AI powered development",
+    "name": "Marcus Vance",
+    "email": "mvance@synthetix.dev",
+    "rating": 5,
+    "comment": "State of the art demos! Seeing live multi-agent pairing with deep context windows was inspiring. The future of software engineering is already here.",
+    "created_at": "2026-10-12T15:59:13.54903+00:00"
+  },
+  {
+    "id": "0054b60c-48ca-43f3-965e-0d93032fda56",
+    "event_name": "AI powered development",
+    "name": "Dr. Sophia Chen",
+    "email": "s.chen@quantum-lab.ai",
+    "rating": 4,
+    "comment": "Great deep dive into architecture and LLM evaluation benchmarks. Would love to see an extended workshop on edge deployment and local model quantizations next time.",
+    "created_at": "2026-10-11T15:59:13.54903+00:00"
+  },
+  {
+    "id": "dd7b0b2f-b1d8-4998-ba27-52bddf4996df",
+    "event_name": "AI powered development",
+    "name": "Devon Miller",
+    "email": "devon@hyperloop-labs.org",
+    "rating": 5,
+    "comment": "Incredible presentation. Clean explanations, mind-blowing tooling, and practical real-world production advice.",
+    "created_at": "2026-10-10T15:59:13.54903+00:00"
+  },
+  {
+    "id": "61fa0d9d-3ae5-4cfa-81f0-185f94343e1e",
+    "event_name": "AI powered development",
+    "name": "Kai Takahashi",
+    "email": "kai@cyberpulse.tokyo",
+    "rating": 5,
+    "comment": "The future of development is here! Unbelievable insights into agentic workflows and AI-driven dev pipelines.",
+    "created_at": "2026-10-13T16:02:48.638224+00:00"
+  },
+  {
+    "id": "d1941e8c-c9d6-4920-83cf-0565fcaa2bb3",
+    "event_name": "AI powered development",
+    "name": "Cyberpunk Pioneer",
+    "email": "pioneer@vjcet.ai",
+    "rating": 5,
+    "comment": "Revolutionary presentation on AI-powered development! The agentic workflows and live coding demonstrations set a new standard.",
+    "created_at": "2026-10-13T16:10:51.099781+00:00"
+  }
+]

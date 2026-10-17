@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Organizer Dashboard for viewing reviews and rating telemetry for AI Powered Development with CSV export." />
+  <title>Attendee Reviews Telemetry &amp; CSV Export · AI Powered Development</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Supabase Official JS SDK CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="cyber-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <a href="/" class="brand-link">
+          <span class="brand-icon">⬡</span>
+          <span>NEXUS // REVIEWS VIEWER</span>
+        </a>
+        <a href="https://vjcet-presentation-website.vercel.app/" target="_blank" rel="noopener" class="main-site-btn" title="Return to main VJCET Showcase website">
+          ← VJCET Showcase ↗
+        </a>
+      </div>
+
+      <div class="nav-right">
+        <a href="https://ai-powered-development-reviews.vercel.app/review" target="_blank" rel="noopener" class="main-site-btn" style="border-color:var(--cyan); color:var(--cyan); background:rgba(0,240,255,0.08);" title="Open attendee review submission form">
+          📝 Public Review Form ↗
+        </a>
+        <!-- Prominent Navbar Download CSV Button -->
+        <button id="exportBtn" class="cyber-btn cyber-btn-primary cyber-btn-sm" style="padding:0.4rem 0.9rem; font-size:0.78rem;">
+          📥 Download CSV
+        </button>
+        <button id="navImportCsvBtn" class="cyber-btn cyber-btn-outline cyber-btn-sm" style="padding:0.4rem 0.8rem; font-size:0.78rem; border-color:var(--cyan); color:var(--cyan);" title="Import reviews from CSV">
+          📤 Import CSV
+        </button>
+        <button id="navResetDataBtn" class="cyber-btn cyber-btn-outline cyber-btn-sm" style="padding:0.4rem 0.8rem; font-size:0.78rem; border-color:#ef4444; color:#f87171;" title="Reset event data with master password">
+          🗑️ Reset Data
+        </button>
+        <button id="refreshBtn" class="cyber-btn cyber-btn-outline cyber-btn-sm" style="padding:0.4rem 0.75rem; font-size:0.78rem;">
+          🔄 Refresh
+        </button>
+        <button id="soundToggleBtn" class="sound-toggle-btn" title="Toggle cyber sound effects">
+          🔊 Sound: ON
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="hero-section" style="padding-bottom:1.5rem;">
+    <div class="event-cyber-badge">
+      <span class="pulse-dot"></span>
+      TELEMETRY MATRIX // AI POWERED DEVELOPMENT
+    </div>
+    <h1 class="hero-title" style="font-size:clamp(2rem, 4.5vw, 3.2rem);">
+      Attendee Reviews &amp; <br />
+      <span class="glow-gradient">Rating Analytics Dashboard</span>
+    </h1>
+    <p class="hero-subtitle" style="margin-bottom:1.2rem;">
+      Live centralized hub for monitoring all submitted ratings, attendee opinions, and qualitative feedback for <strong>AI Powered Development</strong>. No authentication required.
+    </p>
+
+    <!-- Prominent Action Bar with Download as CSV Button -->
+    <div style="display:flex; justify-content:center; align-items:center; gap:0.85rem; flex-wrap:wrap; margin-top:1.2rem; margin-bottom:1.5rem;">
+      <button id="heroDownloadCsvBtn" class="cyber-btn cyber-btn-primary" style="box-shadow: 0 0 25px rgba(0, 240, 255, 0.45); font-size:0.95rem; padding:0.85rem 1.8rem;">
+        📥 Download as CSV File
+      </button>
+      <button id="heroImportCsvBtn" class="cyber-btn cyber-btn-outline" style="border-color:var(--cyan); color:var(--cyan); font-size:0.95rem; padding:0.85rem 1.4rem;">
+        📤 Import CSV File
+      </button>
+      <button id="heroResetBtn" class="cyber-btn cyber-btn-outline" style="border-color:#ef4444; color:#f87171; font-size:0.95rem; padding:0.85rem 1.4rem;" title="Reset event data with master password">
+        🗑️ Reset Data
+      </button>
+      <button id="heroRefreshBtn" class="cyber-btn cyber-btn-outline">
+        🔄 Refresh Live Feed
+      </button>
+      <a href="https://ai-powered-development-reviews.vercel.app/review" target="_blank" rel="noopener" class="cyber-btn cyber-btn-outline" style="border-color:var(--purple-light); color:var(--purple-light);">
+        📝 Submit Test Review ↗
+      </a>
+    </div>
+
+    <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(0, 255, 157, 0.08); border:1px solid rgba(0, 255, 157, 0.3); border-radius:999px; padding:0.35rem 1rem; font-family:var(--font-mono); font-size:0.75rem; color:var(--green);">
+      <span>⚡</span>
+      <span>REALTIME SYNC ACTIVE — Submissions from the review portal appear instantly below</span>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="review-page-container">
+
+    <!-- Workshop Briefing & Poster Card -->
+    <section style="margin-bottom: 2rem;">
+      <div class="cyber-card" style="padding: 1.4rem 1.6rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;">
+          <img
+            src="workshop-poster.jpg"
+            alt="Official Workshop Poster"
+            style="width: 75px; height: 95px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-glow); box-shadow: 0 0 15px rgba(0,240,255,0.25); cursor: pointer;"
+            onclick="window.open('workshop-poster.jpg', '_blank')"
+            title="Click to view full flyer"
+          />
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyan); background: rgba(0,240,255,0.1); padding: 0.2rem 0.55rem; border-radius: 4px; border: 1px solid rgba(0,240,255,0.3);">
+                FOSS CLUB VJCET &times; CSE
+              </span>
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);">
+                S1 CSE A Students &bull; 13 Oct 2026
+              </span>
+            </div>
+            <h3 style="font-family: var(--font-cyber); font-size: 1.12rem; color: #fff; margin-bottom: 0.25rem;">
+              AI Powered Development: Build, Version &amp; Deploy
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--text-dim);">
+              Speaker: <strong>Mr. Reuben Andrews</strong> &bull; Venue: CCC Lab &bull; Focus: <strong>Antigravity &bull; GitHub &bull; Vercel</strong>
+            </p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <a href="workshop-poster.jpg" target="_blank" rel="noopener" class="cyber-btn cyber-btn-outline cyber-btn-sm">
+            🖼️ View Flyer
+          </a>
+          <a href="https://ai-powered-development-reviews.vercel.app/review" target="_blank" rel="noopener" class="cyber-btn cyber-btn-primary cyber-btn-sm">
+            📝 Open Review Form ↗
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Big Holographic Analytics Card -->
+    <section class="analytics-hero-card">
+      
+      <!-- Average Rating Radial Cluster -->
+      <div class="avg-score-cluster">
+        <div class="score-radial-wrap">
+          <svg class="score-radial-svg" viewBox="0 0 140 140">
+            <defs>
+              <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00f0ff" />
+                <stop offset="60%" stop-color="#a855f7" />
+                <stop offset="100%" stop-color="#ec4899" />
+              </linearGradient>
+            </defs>
+            <circle class="score-circle-bg" cx="70" cy="70" r="58" />
+            <circle
+              id="scoreCircleProgress"
+              class="score-circle-progress"
+              cx="70"
+              cy="70"
+              r="58"
+              stroke-dasharray="364.42"
+              stroke-dashoffset="364.42"
+            />
+          </svg>
+          <div class="score-radial-text">
+            <span class="huge-score dyn-avg-rating">0.0</span>
+            <span class="score-scale">out of 5.0</span>
+          </div>
+        </div>
+
+        <div class="cluster-stars">★★★★★</div>
+        <div class="cluster-count-label">
+          <strong class="dyn-total-reviews" style="color:#fff;">0</strong> Total Attendee Ratings
+        </div>
+        <div style="margin-top:0.75rem; font-family:var(--font-mono); font-size:0.75rem; color:var(--cyan); background:rgba(0,240,255,0.1); padding:0.25rem 0.65rem; border-radius:999px;">
+          ⚡ <span class="dyn-positive-rate">0%</span> Positive Approval
+        </div>
+      </div>
+
+      <!-- Rating Distribution Bars -->
+      <div class="breakdown-bars-cluster">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+          <h3 style="font-family:var(--font-cyber); font-size:1.05rem; color:#fff;">
+            📊 Star Rating Breakdown
+          </h3>
+          <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-dim);">
+            AI Powered Development
+          </span>
+        </div>
+
+        <!-- 5 Stars -->
+        <div class="distribution-row">
+          <div class="dist-star-label">
+            <span style="color:#ffd700;">★</span> 5 Star
+          </div>
+          <div class="dist-bar-track">
+            <div class="dist-bar-fill" id="distBar5" style="width: 0%;"></div>
+          </div>
+          <div class="dist-count-badge" id="distCount5">0 (0%)</div>
+        </div>
+
+        <!-- 4 Stars -->
+        <div class="distribution-row">
+          <div class="dist-star-label">
+            <span style="color:#ffd700;">★</span> 4 Star
+          </div>
+          <div class="dist-bar-track">
+            <div class="dist-bar-fill" id="distBar4" style="width: 0%;"></div>
+          </div>
+          <div class="dist-count-badge" id="distCount4">0 (0%)</div>
+        </div>
+
+        <!-- 3 Stars -->
+        <div class="distribution-row">
+          <div class="dist-star-label">
+            <span style="color:#ffd700;">★</span> 3 Star
+          </div>
+          <div class="dist-bar-track">
+            <div class="dist-bar-fill" id="distBar3" style="width: 0%;"></div>
+          </div>
+          <div class="dist-count-badge" id="distCount3">0 (0%)</div>
+        </div>
+
+        <!-- 2 Stars -->
+        <div class="distribution-row">
+          <div class="dist-star-label">
+            <span style="color:#ffd700;">★</span> 2 Star
+          </div>
+          <div class="dist-bar-track">
+            <div class="dist-bar-fill" id="distBar2" style="width: 0%;"></div>
+          </div>
+          <div class="dist-count-badge" id="distCount2">0 (0%)</div>
+        </div>
+
+        <!-- 1 Star -->
+        <div class="distribution-row">
+          <div class="dist-star-label">
+            <span style="color:#ffd700;">★</span> 1 Star
+          </div>
+          <div class="dist-bar-track">
+            <div class="dist-bar-fill" id="distBar1" style="width: 0%;"></div>
+          </div>
+          <div class="dist-count-badge" id="distCount1">0 (0%)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery Toolbar & Filters -->
+    <div class="gallery-toolbar">
+      <div class="toolbar-left">
+        <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); margin-right:0.25rem;">
+          FILTER:
+        </span>
+        <button class="filter-chip active" data-star="all">All Reviews</button>
+        <button class="filter-chip" data-star="5">5 ★ Next-Gen</button>
+        <button class="filter-chip" data-star="4">4 ★ Impressive</button>
+        <button class="filter-chip" data-star="3">3 ★ Solid</button>
+        <button class="filter-chip" data-star="2">2 ★ Fair</button>
+        <button class="filter-chip" data-star="1">1 ★ Basic</button>
+      </div>
+
+      <div class="toolbar-right">
+        <!-- Search Input -->
+        <div class="search-box" style="padding:0.35rem 0.75rem; width:200px;">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search attendee or text..."
+            aria-label="Search reviews"
+          />
+        </div>
+
+        <label for="sortSelect" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-dim); margin-left:0.4rem;">
+          SORT:
+        </label>
+        <select id="sortSelect" class="cyber-select">
+          <option value="newest">🕒 Newest First</option>
+          <option value="highest">⭐ Highest Rating</option>
+          <option value="lowest">📉 Lowest Rating</option>
+        </select>
+
+        <button id="toolbarExportBtn" class="cyber-btn cyber-btn-primary cyber-btn-sm" style="padding:0.4rem 0.8rem; font-size:0.78rem;">
+          📥 Download CSV
+        </button>
+        <button id="toolbarImportBtn" class="cyber-btn cyber-btn-outline cyber-btn-sm" style="padding:0.4rem 0.8rem; font-size:0.78rem; border-color:var(--cyan); color:var(--cyan);">
+          📤 Import CSV
+        </button>
+        <button id="toolbarResetBtn" class="cyber-btn cyber-btn-outline cyber-btn-sm" style="padding:0.4rem 0.8rem; font-size:0.78rem; border-color:#ef4444; color:#f87171;" title="Reset event data with master password">
+          🗑️ Reset Data
+        </button>
+      </div>
+    </div>
+
+    <!-- Review-Seeing Area Average Rating Telemetry Header -->
+    <div class="reviews-telemetry-header">
+      <div class="telemetry-header-left">
+        <h2 style="font-family: var(--font-cyber); font-size: 1.15rem; color: #fff; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <span>💬</span> Attendee Reviews
+        </h2>
+
+        <!-- The Average Rating Thing in the Review-Seeing Area -->
+        <div class="avg-rating-chip-hud" title="Event Average Rating">
+          <span style="color: #ffd700; font-size: 1.15rem; filter: drop-shadow(0 0 6px #ffd700);">★</span>
+          <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase;">Average Rating:</span>
+          <strong class="dyn-avg-rating" style="font-family: var(--font-cyber); font-size: 1.25rem; font-weight: 900; color: #fff; text-shadow: 0 0 12px var(--cyan);">0.0</strong>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">/ 5.0</span>
+          <span class="dyn-stars-glyph" style="color: #ffd700; font-size: 0.95rem; margin-left: 0.25rem; letter-spacing: 2px;">★★★★★</span>
+        </div>
+
+        <div class="stat-pill-mini">
+          <span style="color: var(--cyan);">👥</span>
+          <span><strong class="dyn-total-reviews" style="color:#fff;">0</strong> Ratings</span>
+        </div>
+
+        <div class="stat-pill-mini">
+          <span style="color: var(--green);">⚡</span>
+          <span><strong class="dyn-positive-rate" style="color:#fff;">0%</strong> Satisfaction</span>
+        </div>
+      </div>
+
+      <div class="telemetry-header-right">
+        <span id="countBadge" style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">
+          Syncing attendee reviews from Supabase...
+        </span>
+        <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyan); background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.25); padding: 0.2rem 0.55rem; border-radius: 999px;">
+          <span class="pulse-dot"></span> LIVE SYNC
+        </span>
+      </div>
+    </div>
+
+    <!-- Holographic Opinions Grid -->
+    <div id="reviewsGrid" class="reviews-grid">
+      <div class="loading-box" style="grid-column: 1 / -1;">
+        <div class="cyber-spinner"></div>
+        <span>Syncing telemetry from Supabase Cloud...</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Hidden File Input for CSV Upload -->
+  <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none;" />
+
+  <!-- Reset Data Modal (Master Password: Black1) -->
+  <div id="resetModal" class="cyber-modal-overlay">
+    <div class="cyber-modal-card danger-modal" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+      <button class="modal-close-btn" id="closeResetModalBtn" aria-label="Close modal">&times;</button>
+      
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+        <span style="font-size:1.6rem; color:#ef4444; filter:drop-shadow(0 0 10px rgba(239,68,68,0.5));">⚠️</span>
+        <div>
+          <div style="font-family:var(--font-mono); font-size:0.72rem; color:#f87171; letter-spacing:1px;">CRITICAL SYSTEM OPERATION</div>
+          <h3 id="resetModalTitle" style="font-family:var(--font-cyber); font-size:1.3rem; color:#fff; margin:0;">
+            Purge &amp; Reset Event Data
+          </h3>
+        </div>
+      </div>
+
+      <div class="cyber-warning-banner">
+        <span style="font-size:1.2rem;">🚨</span>
+        <div style="font-size:0.83rem; color:#fca5a5; line-height:1.45;">
+          <strong>Warning:</strong> This will permanently erase all attendee reviews, comments, and reset the average rating score to <strong>0.0</strong> for <em>AI powered development</em>. This action cannot be undone.
+        </div>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label for="resetPasswordInput" style="display:block; font-family:var(--font-mono); font-size:0.78rem; color:var(--text-dim); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.5px;">
+          Master Authorization Password:
+        </label>
+        <div class="password-input-wrap">
+          <input
+            type="password"
+            id="resetPasswordInput"
+            class="cyber-input"
+            placeholder="Enter authorization password..."
+            autocomplete="off"
+            style="padding-right:2.5rem; border-color:rgba(239,68,68,0.4);"
+          />
+          <button type="button" id="toggleResetPwdBtn" class="password-toggle-eye" title="Toggle password visibility">
+            👁️
+          </button>
+        </div>
+        <div id="resetErrorMsg" style="color:#ef4444; font-family:var(--font-mono); font-size:0.78rem; margin-top:0.5rem; display:none;"></div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem; flex-wrap:wrap;">
+        <button id="cancelResetBtn" class="cyber-btn cyber-btn-outline">
+          Cancel
+        </button>
+        <button id="confirmResetBtn" class="cyber-btn" style="background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; border:1px solid #f87171; box-shadow:0 0 20px rgba(239,68,68,0.4);">
+          🔥 Confirm Purge &amp; Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import CSV Modal -->
+  <div id="importModal" class="cyber-modal-overlay">
+    <div class="cyber-modal-card" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
+      <button class="modal-close-btn" id="closeImportModalBtn" aria-label="Close modal">&times;</button>
+      
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+        <span style="font-size:1.6rem; color:var(--cyan); filter:drop-shadow(0 0 10px rgba(0,240,255,0.5));">📤</span>
+        <div>
+          <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--cyan); letter-spacing:1px;">BATCH INGESTION MATRIX</div>
+          <h3 id="importModalTitle" style="font-family:var(--font-cyber); font-size:1.3rem; color:#fff; margin:0;">
+            Import Reviews from CSV
+          </h3>
+        </div>
+      </div>
+
+      <div class="cyber-info-banner">
+        <span>💡</span>
+        <div>
+          Upload any <strong>.csv file</strong> exported from this dashboard or formatted with headers: 
+          <code style="color:var(--cyan); font-family:var(--font-mono); font-size:0.76rem;">Attendee Name, Email, Rating (1-5), Comment</code>.
+        </div>
+      </div>
+
+      <!-- Dropzone -->
+      <div class="csv-dropzone" id="csvDropzone">
+        <div style="font-size:2.5rem; margin-bottom:0.5rem;">📁</div>
+        <h4 style="font-family:var(--font-cyber); font-size:1.05rem; color:#fff; margin-bottom:0.35rem;">
+          Drag &amp; Drop CSV File Here
+        </h4>
+        <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem;">
+          Supports comma-separated .csv files up to 5 MB
+        </p>
+        <button type="button" id="browseCsvBtn" class="cyber-btn cyber-btn-outline cyber-btn-sm" style="border-color:var(--cyan); color:var(--cyan);">
+          📂 Select CSV File From Computer
+        </button>
+      </div>
+
+      <!-- Preview Table Area (hidden initially) -->
+      <div id="csvPreviewArea" style="display:none; margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; flex-wrap:wrap; gap:0.5rem;">
+          <span id="csvFileLabel" style="font-family:var(--font-mono); font-size:0.78rem; color:#fff;"></span>
+          <span id="csvRowCountBadge" class="stat-pill-mini" style="color:var(--green); border-color:rgba(0,255,157,0.3);">
+            0 records ready
+          </span>
+        </div>
+        <div class="csv-preview-table-wrap">
+          <table class="csv-preview-table">
+            <thead>
+              <tr>
+                <th>Attendee</th>
+                <th>Rating</th>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody id="csvPreviewBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem; flex-wrap:wrap;">
+        <button id="cancelImportBtn" class="cyber-btn cyber-btn-outline">
+          Cancel
+        </button>
+        <button id="confirmImportBtn" class="cyber-btn cyber-btn-primary" style="display:none;">
+          ⚡ Confirm &amp; Ingest Reviews
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="cyber-footer">
+    <div class="footer-content">
+      <div class="footer-brand-text">
+        ⬡ AI POWERED DEVELOPMENT · ORGANIZER DASHBOARD &copy; 2026
+      </div>
+      <div class="footer-links">
+        <a href="https://vjcet-presentation-website.vercel.app/" target="_blank" rel="noopener" class="footer-link">
+          VJCET Main Showcase ↗
+        </a>
+        <a href="https://ai-powered-development-reviews.vercel.app/review" target="_blank" rel="noopener" class="footer-link">
+          Review Portal ↗
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="particles.js"></script>
+  <script src="audio.js"></script>
+  <script src="supabase.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
